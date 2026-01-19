@@ -3,6 +3,8 @@ package org.curso.spring.besttravel.api.models.dto.response;
 import lombok.*;
 import org.curso.spring.besttravel.utils.enums.AeroLine;
 
+import java.math.BigDecimal;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,4 +28,6 @@ public class FlyResponse {
     private String destinationName;
 
     private AeroLine aeroLine;
+
+    private BigDecimal price;
 }
