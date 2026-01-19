@@ -41,7 +41,7 @@ public class FlyController {
 
     @GetMapping("/search/{ticketId}")
     public ResponseEntity<FlyResponse> findByTicketId(@PathVariable UUID ticketId) {
-        return ResponseEntity.ok(flyService.findByTicketId(id));
+        return ResponseEntity.ok(flyService.findByTicketId(ticketId));
     }
 
 }
