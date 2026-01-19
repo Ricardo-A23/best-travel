@@ -17,7 +17,7 @@ public class FlyController {
 
     private final IFlyService flyService;
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<Page<FlyResponse>> findAll(
             @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(flyService.getAll(page, size));
