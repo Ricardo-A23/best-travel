@@ -10,10 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -25,30 +25,35 @@ public class FlyServiceImpl implements IFlyService {
     private final FlyMapper flyMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<FlyResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return flyRepository.findAll(pageable).map(flyMapper::toResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FlyResponse> selectLessPrice(BigDecimal price) {
         List<Fly> vuelos = flyRepository.selectLessPrice(price);
         return flyMapper.toResponseList(vuelos);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FlyResponse> selectBetweenPrice(BigDecimal priceMin, BigDecimal priceMax) {
         List<Fly> vuelos = flyRepository.selectBetweenPrice(priceMin, priceMax);
         return flyMapper.toResponseList(vuelos);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FlyResponse> selectOriginDestiny(String origin, String destiny) {
         List<Fly> vuelos = flyRepository.selectOriginDestiny(origin, destiny);
         return flyMapper.toResponseList(vuelos);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FlyResponse findByTicketId(UUID id) {
         Fly fly = flyRepository.findByTicketId(id)
                 .orElseThrow(() -> new RuntimeException("Fly not found"));
