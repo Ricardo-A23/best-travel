@@ -51,15 +51,13 @@ public class Tour {
     }
 
     public void removeTicket(UUID id) {
-        if (id != null) {
-            tickets.stream()
-                    .filter(ticket -> ticket.getId().equals(id))
-                    .findFirst()
-                    .ifPresent(ticket -> {
-                        tickets.remove(ticket);
-                        ticket.setTour(null);
-                    });
-        }
+       tickets.removeIf(ticket -> {
+           if (ticket.getId().equals(id)) {
+               ticket.setTour(null);
+               return true;
+           }
+           return false;
+       });
     }
 
     public void addReservation(Reservation reservation) {
@@ -71,15 +69,13 @@ public class Tour {
     }
 
     public void removeReservation(UUID id) {
-        if (id != null) {
-            reservations.stream()
-                    .filter(reservation -> reservation.getId().equals(id))
-                    .findFirst()
-                    .ifPresent(reservation -> {
-                        reservations.remove(reservation);
-                        reservation.setTour(null);
-                    });
-        }
+        reservations.removeIf(reservation ->  {
+            if (reservation.getId().equals(id)) {
+                reservation.setTour(null);
+                return true;
+            }
+            return false;
+        });
     }
 }
 
