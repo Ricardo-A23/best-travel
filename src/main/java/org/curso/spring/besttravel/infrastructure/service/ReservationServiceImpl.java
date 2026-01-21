@@ -8,7 +8,8 @@ import org.curso.spring.besttravel.api.models.mappers.ReservationMapper;
 import org.curso.spring.besttravel.domain.entities.Customer;
 import org.curso.spring.besttravel.domain.entities.Hotel;
 import org.curso.spring.besttravel.domain.entities.Reservation;
-import org.curso.spring.besttravel.domain.repository.CustumerRepository;
+import org.curso.spring.besttravel.domain.exceptions.ResourceNotFoundException;
+import org.curso.spring.besttravel.domain.repository.CustomerRepository;
 import org.curso.spring.besttravel.domain.repository.HotelRepository;
 import org.curso.spring.besttravel.domain.repository.ReservationRepository;
 import org.curso.spring.besttravel.infrastructure.abstract_service.IReservationService;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -26,25 +26,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements IReservationService {
 
-    private final ReservationRepository repository;
+    private final ReservationRepository reservationRepository;
     private final ReservationMapper mapper;
     private final HotelRepository hotelRepository;
-    private final CustumerRepository custumerRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
     @Transactional(readOnly = true)
     public ReservationResponse findById(UUID id) {
-        return repository.findById(id).map(mapper::toResponse).orElseThrow(() -> new NoSuchElementException("reservacion no encontrada"));
+        return reservationRepository.findById(id).map(mapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation", id.toString()));
     }
 
     @Override
     @Transactional
     public ReservationResponse create(ReservationRequest request) {
         Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new RuntimeException("hotel no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel",  request.getHotelId().toString()));
 
-        Customer customer = custumerRepository.findById(request.getCostumerId())
-                .orElseThrow(() -> new RuntimeException("custumer no encontrada"));
+        Customer customer = customerRepository.findById(request.getCostumerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer",  request.getCostumerId()));
 
         Reservation reservation = Reservation.builder()
                 .id(UUID.randomUUID())
@@ -56,17 +57,17 @@ public class ReservationServiceImpl implements IReservationService {
                 .customer(customer)
                 .hotel(hotel)
                 .build();
-        return mapper.toResponse(repository.save(reservation));
+        return mapper.toResponse(reservationRepository.save(reservation));
     }
 
     @Override
     @Transactional
     public ReservationResponse update(ReservationRequest reservationRequest, UUID id) {
-        Reservation reservation = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("reservacion no encontrada"));
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation", id.toString()));
 
         Hotel hotel = hotelRepository.findById(reservationRequest.getHotelId())
-                .orElseThrow(() -> new RuntimeException("hotel no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel",  reservationRequest.getHotelId().toString()));
 
         reservation.setDateTimeReservation(LocalDateTime.now());
         reservation.setDateStart(LocalDate.now());
@@ -75,15 +76,15 @@ public class ReservationServiceImpl implements IReservationService {
         reservation.setHotel(hotel);
 
         log.info("Reservacion update Success with id {}", reservation.getId());
-        return mapper.toResponse(repository.save(reservation));
+        return mapper.toResponse(reservationRepository.save(reservation));
     }
 
     @Override
     @Transactional
     public void deleteById(UUID id) {
-        if(!repository.existsById(id)) {
-           throw new RuntimeException("reservacion no encontrada");
+        if(!reservationRepository.existsById(id)) {
+           throw new ResourceNotFoundException("Reservatio", id.toString());
         }
-        repository.deleteById(id);
+        reservationRepository.deleteById(id);
     }
 }

@@ -1,5 +1,6 @@
 package org.curso.spring.besttravel.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.curso.spring.besttravel.api.models.dto.request.TourRequest;
 import org.curso.spring.besttravel.api.models.dto.response.TourResponse;
@@ -24,7 +25,7 @@ public class TourController {
     }
 
     @PostMapping
-    public ResponseEntity<TourResponse> createTour(@RequestBody TourRequest tourRequest) {
+    public ResponseEntity<TourResponse> createTour(@Valid @RequestBody TourRequest tourRequest) {
 
         TourResponse response = tourService.create(tourRequest);
 
@@ -37,7 +38,7 @@ public class TourController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TourResponse> updateTour(@PathVariable Long id, @RequestBody TourRequest updateRequest) {
+    public ResponseEntity<TourResponse> updateTour(@PathVariable Long id, @Valid @RequestBody TourRequest updateRequest) {
         return ResponseEntity.ok(tourService.update(id, updateRequest));
     }
 

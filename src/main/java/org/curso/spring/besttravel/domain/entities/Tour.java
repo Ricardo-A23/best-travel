@@ -2,6 +2,7 @@ package org.curso.spring.besttravel.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.curso.spring.besttravel.domain.exceptions.ResourceNotFoundException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -51,13 +52,17 @@ public class Tour {
     }
 
     public void removeTicket(UUID id) {
-       tickets.removeIf(ticket -> {
+      boolean removed = tickets.removeIf(ticket -> {
            if (ticket.getId().equals(id)) {
                ticket.setTour(null);
                return true;
            }
            return false;
        });
+
+      if (!removed) {
+         throw new ResourceNotFoundException("Ticket", id.toString());
+      }
     }
 
     public void addReservation(Reservation reservation) {
@@ -69,13 +74,17 @@ public class Tour {
     }
 
     public void removeReservation(UUID id) {
-        reservations.removeIf(reservation ->  {
+       boolean removed = reservations.removeIf(reservation ->  {
             if (reservation.getId().equals(id)) {
                 reservation.setTour(null);
                 return true;
             }
             return false;
         });
+
+       if (!removed) {
+           throw new ResourceNotFoundException("Reservation ", id.toString());
+       }
     }
 }
 

@@ -8,7 +8,8 @@ import org.curso.spring.besttravel.api.models.mappers.TicketMapper;
 import org.curso.spring.besttravel.domain.entities.Customer;
 import org.curso.spring.besttravel.domain.entities.Fly;
 import org.curso.spring.besttravel.domain.entities.Ticket;
-import org.curso.spring.besttravel.domain.repository.CustumerRepository;
+import org.curso.spring.besttravel.domain.exceptions.ResourceNotFoundException;
+import org.curso.spring.besttravel.domain.repository.CustomerRepository;
 import org.curso.spring.besttravel.domain.repository.FlyRepository;
 import org.curso.spring.besttravel.domain.repository.TicketRepository;
 import org.curso.spring.besttravel.infrastructure.abstract_service.ITicketService;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -28,23 +28,24 @@ import java.util.UUID;
 public class TicketServiceImpl implements ITicketService {
 
     private final FlyRepository flyRepository;
-    private final CustumerRepository custumerRepository;
+    private final CustomerRepository customerRepository;
     private final TicketRepository ticketRepository;
     private final TicketMapper ticketMapper;
 
     @Override
     @Transactional(readOnly = true)
     public TicketResponse findById(UUID id) {
-        return ticketMapper.toResponse(ticketRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Ticket Not Found")));
+        return ticketMapper.toResponse(ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", id.toString())));
     }
 
     @Override
     @Transactional
     public TicketResponse create(TicketRequest ticketRequest) {
-        Customer customer = custumerRepository.findById(ticketRequest.getClienteId())
-                .orElseThrow(() -> new NoSuchElementException("Costumer Not Found"));
+        Customer customer = customerRepository.findById(ticketRequest.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Costumer",  ticketRequest.getCustomerId()));
         Fly fly = flyRepository.findById(ticketRequest.getFlyId())
-                .orElseThrow(() -> new NoSuchElementException("Fly Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Fly",   ticketRequest.getFlyId()));
 
         Ticket ticket = Ticket.builder()
                 .id(UUID.randomUUID())
@@ -69,10 +70,11 @@ public class TicketServiceImpl implements ITicketService {
     @Transactional
     public TicketResponse update(TicketRequest ticketRequest, UUID uuid) {
 
-        Ticket ticketToUpdate = ticketRepository.findById(uuid).orElseThrow(() -> new NoSuchElementException("Ticket Not Found"));
+        Ticket ticketToUpdate = ticketRepository.findById(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", uuid.toString()));
 
         Fly fly = flyRepository.findById(ticketRequest.getFlyId())
-                .orElseThrow(() -> new NoSuchElementException("Fly Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Fly", ticketRequest.getFlyId()));
 
         ticketToUpdate.setFly(fly);
         ticketToUpdate.setPrice(fly.getPrice().multiply(BigDecimal.valueOf(0.25)));
@@ -90,10 +92,8 @@ public class TicketServiceImpl implements ITicketService {
     @Override
     @Transactional
     public void deleteById(UUID uuid) {
-        if(uuid == null) {
-            throw  new IllegalArgumentException("El id no puede ser nulo");
-        }
-        Ticket ticketToDelete = ticketRepository.findById(uuid).orElseThrow(() -> new NoSuchElementException("Ticket Not Found"));
+        Ticket ticketToDelete = ticketRepository.findById(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket",  uuid.toString()));
         ticketRepository.delete(ticketToDelete);
     }
 

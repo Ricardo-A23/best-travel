@@ -1,5 +1,6 @@
 package org.curso.spring.besttravel.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.curso.spring.besttravel.api.models.dto.request.TicketRequest;
 import org.curso.spring.besttravel.api.models.dto.response.TicketResponse;
@@ -23,12 +24,12 @@ public class TicketController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponse> createTicket(@RequestBody TicketRequest ticketRequest) {
+    public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest ticketRequest) {
         return ResponseEntity.ok(ticketService.create(ticketRequest));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<TicketResponse> updateTicket(@RequestBody TicketRequest ticketRequest, @PathVariable UUID id) {
+    public ResponseEntity<TicketResponse> updateTicket(@Valid @RequestBody TicketRequest ticketRequest, @PathVariable UUID id) {
         return ResponseEntity.ok(ticketService.update(ticketRequest, id));
     }
 

@@ -1,5 +1,6 @@
 package org.curso.spring.besttravel.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.curso.spring.besttravel.api.models.dto.request.ReservationRequest;
 import org.curso.spring.besttravel.api.models.dto.response.ReservationResponse;
@@ -23,13 +24,13 @@ public class ReservationController {
     }
 
     @PostMapping("/crear")
-    public ResponseEntity<ReservationResponse> crearReservacion(@RequestBody ReservationRequest reservationRequest){
+    public ResponseEntity<ReservationResponse> crearReservacion(@Valid @RequestBody ReservationRequest reservationRequest){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reservationService.create(reservationRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReservationResponse> modificarReservacion(@RequestBody ReservationRequest reservationRequest,  @PathVariable UUID id){
+    public ResponseEntity<ReservationResponse> modificarReservacion(@Valid @RequestBody ReservationRequest reservationRequest, @PathVariable UUID id){
         return ResponseEntity.ok(reservationService.update(reservationRequest,id));
     }
 

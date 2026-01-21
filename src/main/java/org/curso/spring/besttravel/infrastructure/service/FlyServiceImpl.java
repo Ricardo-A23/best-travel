@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.curso.spring.besttravel.api.models.dto.response.FlyResponse;
 import org.curso.spring.besttravel.api.models.mappers.FlyMapper;
 import org.curso.spring.besttravel.domain.entities.Fly;
+import org.curso.spring.besttravel.domain.exceptions.ResourceNotFoundException;
 import org.curso.spring.besttravel.domain.repository.FlyRepository;
 import org.curso.spring.besttravel.infrastructure.abstract_service.IFlyService;
 import org.springframework.data.domain.Page;
@@ -56,7 +57,7 @@ public class FlyServiceImpl implements IFlyService {
     @Transactional(readOnly = true)
     public FlyResponse findByTicketId(UUID id) {
         Fly fly = flyRepository.findByTicketId(id)
-                .orElseThrow(() -> new RuntimeException("Fly not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Fly",  id.toString()));
         return flyMapper.toResponse(fly);
     }
 
